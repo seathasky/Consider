@@ -2,6 +2,10 @@
 
 A World of Warcraft Classic Era addon that emulates the classic "consider" command from early MMORPGs. Get instant feedback on how challenging a target will be before engaging in combat. A perfect edition to Ultra Hardcore addon.
 
+<img src="https://raw.githubusercontent.com/seathasky/Consider/refs/heads/main/img/examples.png" alt="Consider examples" width="500">
+
+
+
 ## Features
 
 - **Target Analysis**: Quickly assess the difficulty of any target based on level difference
@@ -34,15 +38,17 @@ A World of Warcraft Classic Era addon that emulates the classic "consider" comma
 
 The addon uses the classic MMO color system to indicate difficulty:
 
-| Color | Meaning | Description |
-|-------|---------|-------------|
-| **Red** | Impossible | Target will likely defeat you easily |
-| **Orange** | Very Hard | Would take exceptional skill to defeat |
-| **Yellow** | Harder | A challenging but winnable fight |
-| **White** | Even Match | Fair fight with uncertain outcome |
-| **Blue** | Easier | You have a clear advantage |
-| **Green** | Much Easier | Target poses little threat |
-| **Gray** | No Reward | Too weak to provide experience/rewards |
+| Color | Meaning      | Description |
+|-------|--------------|-------------|
+| 🟥 Red    | Impossible | Target will likely defeat you easily |
+| 🟧 Orange | Very Hard  | Would take exceptional skill to defeat |
+| 🟨 Yellow | Harder     | A challenging but winnable fight |
+| ⬜ White  | Even Match | Fair fight with uncertain outcome |
+| 🟦 Blue   | Easier     | You have a clear advantage |
+| 🟩 Green  | Much Easier| Target poses little threat |
+| ⬛ Gray   | No Reward  | Too weak to provide experience/rewards |
+
+
 
 ## Commands
 
