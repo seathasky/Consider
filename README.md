@@ -1,6 +1,6 @@
 # Consider
 
-A World of Warcraft Classic Era addon that emulates the classic "consider" command from early MMORPGs. Get instant feedback on how challenging a target will be before engaging in combat.
+A World of Warcraft Classic Era addon that emulates the classic "consider" command from early MMORPGs. Get instant feedback on how challenging a target will be before engaging in combat. A perfect edition to Ultra Hardcore addon.
 
 ## Features
 
@@ -49,50 +49,6 @@ The addon uses the classic MMO color system to indicate difficulty:
 - `/consider` - Opens the settings window to configure keybindings
 - `/con` - Performs a consider check on your current target (testing/backup command)
 
-## Technical Details
-
-- **Interface Version**: 11507 (Classic Era)
-- **Saved Variables**: Your keybind preference is saved per character
-- **Dependencies**: None - works with the base game
-- **Memory Usage**: Minimal footprint
-- **Compatibility**: Works alongside other addons without conflicts
-
-## Settings Window
-
-The settings window includes:
-- **Addon Description**: Brief explanation of functionality
-- **Color Legend**: Visual reference for all difficulty colors
-- **Keybind Display**: Shows your current key combination
-- **Capture Key Button**: Click and press a key to bind
-- **Manual Entry Field**: Type key combinations directly
-- **Draggable Interface**: Move the window anywhere on screen
-
-## Key Combination Examples
-
-- Single keys: `G`, `F`, `T`
-- With modifiers: `SHIFT-G`, `CTRL-F`, `ALT-T`
-- Multiple modifiers: `CTRL-SHIFT-C`
-- Function keys: `F1`, `F2`, etc.
-
-## Contributing
-
-This addon is designed to be simple and focused. If you encounter bugs or have suggestions for improvements, please:
-
-1. Ensure you're using the latest version
-2. Test with minimal addons to isolate conflicts
-3. Provide specific steps to reproduce any issues
-
-## License
-
-This addon is provided as-is for the World of Warcraft Classic Era community. Feel free to modify for personal use.
-
-## Changelog
-
-### Version 1.0.0
-- Initial release
-- Target difficulty assessment with color coding
-- Customizable keybinding system
-- Settings GUI with drag support
 - Automatic keybind saving
 - Clean chat notifications
 
