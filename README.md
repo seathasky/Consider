@@ -1,6 +1,6 @@
 # Consider
 
-A World of Warcraft Classic Era addon that emulates the classic "consider" command from early MMORPGs. Get instant feedback on how challenging a target will be before engaging in combat. A perfect edition to Ultra Hardcore addon.
+A World of Warcraft Classic Era addon that emulates the classic "consider" command from early MMORPGs. Get instant feedback on how challenging a target will be before engaging in combat. Works best without nameplates, player and targets frames.
 
 <img src="https://raw.githubusercontent.com/seathasky/Consider/refs/heads/main/img/examples.png" alt="Consider examples" width="500">
 
