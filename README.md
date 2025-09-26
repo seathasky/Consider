@@ -2,7 +2,7 @@
 
 A World of Warcraft Classic Era addon that emulates the classic "consider" command from early MMORPGs. Get instant feedback on how challenging a target will be before engaging in combat. Works best without nameplates, player and targets frames.
 
-<img src="https://github.com/seathasky/Consider/blob/main/img/example.png?raw=true" alt="Consider examples">
+<img src="https://raw.githubusercontent.com/seathasky/Consider/refs/heads/main/img/betterexample.png" alt="Consider examples">
 
 
 
