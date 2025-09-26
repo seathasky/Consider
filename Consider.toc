@@ -1,6 +1,6 @@
 ## Interface: 11507
 ## Title: Consider
-## Version: 1.0.0
+## Version: 1.0.1
 ## Author: Seathasky
 ## Notes: Emulates Consider target from classic MMOs. Meant for HC servers.
 ## SavedVariables: ConsiderDB

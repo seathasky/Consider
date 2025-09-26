@@ -6,7 +6,7 @@ local function GetDifficultyColor(targetLevel, playerLevel)
     if levelDiff >= 5 then
         return "|cffff0000", " looks like it would wipe the floor with you."
     elseif levelDiff >= 3 then
-        return "|cffff8000", " would take an army to defeat."
+        return "|cffff8000", " looks extremely dangerous."
     elseif levelDiff >= 1 then
         return "|cffffff00", " looks like quite a challenge."
     elseif levelDiff == 0 then
@@ -52,6 +52,73 @@ local function ConsiderTarget()
     local playerLevel = UnitLevel("player")
     local classif = UnitClassification(unit)
     local classifText = ""
+    
+    -- Check if target is dead
+    if UnitIsDead(unit) then
+        local creatureType = UnitCreatureType(unit)
+        
+        -- Special message for dead beasts
+        if creatureType == "Beast" then
+            local sleepMessages = {
+                " is asleep.",
+                " is just sleeping.",
+                " is not dead, just taking a nap.",
+                " is sleeping.",
+                " is snoring peacefully.",
+                " forgot to set an alarm.",
+                " is having the best nap ever."
+            }
+            local randomSleep = sleepMessages[math.random(#sleepMessages)]
+            print("[Consider] |cff808080" .. name .. randomSleep .. "|r")
+            return
+        end
+        
+        -- Special messages for dead critters
+        if creatureType == "Critter" then
+            local critterMessages = {
+                " was just trying to live peacefully.",
+                " didn't deserve this fate.",
+                " was minding its own business.",
+                " lived a simple life.",
+                " is roadkill.",
+                " never hurt anyone."
+            }
+            local randomCritter = critterMessages[math.random(#critterMessages)]
+            print("[Consider] |cff808080" .. name .. randomCritter .. "|r")
+            return
+        end
+        
+        -- Regular jokes for other creatures
+        local jokes = {
+            " is pushing up daisies.",
+            " has shuffled off this mortal coil.",
+            " is taking a dirt nap.",
+            " has joined the choir invisible.",
+            " is definitely not getting back up.",
+            " is sleeping with the fishes.",
+            " has gone to the great beyond.",
+            " is deadge.",
+            " is deader than a doornail."
+        }
+        local randomJoke = jokes[math.random(#jokes)]
+        print("[Consider] |cff808080" .. name .. randomJoke .. "|r")
+        return
+    end
+    
+    -- Special handling for alive critters
+    local creatureType = UnitCreatureType(unit)
+    if creatureType == "Critter" then
+        local critterAliveMessages = {
+            " is just trying to live peacefully.",
+            " doesn't want any trouble.",
+            " poses no threat to anyone.",
+            " just wants to be left alone.",
+            " is innocent and harmless."
+        }
+        local randomMessage = critterAliveMessages[math.random(#critterAliveMessages)]
+        print("[Consider] |cff00ff00" .. name .. randomMessage .. "|r")
+        return
+    end
     
     if classif == "elite" then
         classifText = " (Elite)"
@@ -116,7 +183,7 @@ local colorLegend = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontHigh
 colorLegend:SetPoint("TOPLEFT", colorHeader, "BOTTOMLEFT", 0, -8)
 colorLegend:SetPoint("RIGHT", descriptionText, "RIGHT", 0, 0)
 colorLegend:SetJustifyH("LEFT")
-colorLegend:SetText("|cffff0000Red|r – Impossible\n|cffff8000Orange|r – Very Hard\n|cffffff00Yellow|r – Harder\n|cffffffffWhite|r – Even Match\n|cff0080ffBlue|r – Easier\n|cff00ff00Green|r – Much Easier\n|cff808080Gray|r – No Reward")
+colorLegend:SetText("|cffff0000Red|r – Impossible\n|cffff8000Orange|r – Extremely Dangerous\n|cffffff00Yellow|r – Harder\n|cffffffffWhite|r – Even Match\n|cff0080ffBlue|r – Easier\n|cff00ff00Green|r – Much Easier\n|cff808080Gray|r – No Reward")
 
 local divider = settingsFrame:CreateTexture(nil, "ARTWORK")
 divider:SetColorTexture(1, 1, 1, 0.15)
