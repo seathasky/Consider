@@ -66,4 +66,8 @@ The addon uses the classic MMO color system to indicate difficulty:
 
 ---
 
+[License](http://example.com](https://raw.githubusercontent.com/seathasky/Consider/refs/heads/main/LICENSE))
+
+---
+
 *Relive the nostalgia of classic MMO target assessment with Consider - making every encounter decision informed.*
