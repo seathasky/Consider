@@ -1,3 +1,7 @@
+-- Consider Addon
+-- Copyright (c) 2025 Matthew Paul Centonze ("seathasky")
+-- Licensed under the MIT License (see LICENSE file for details)
+
 ConsiderDB = ConsiderDB or {}
 
 local function GetDifficultyColor(targetLevel, playerLevel)
@@ -360,3 +364,4 @@ SlashCmdList['CONSIDERSETTINGS'] = function() settingsFrame:Show() end
 
 SLASH_CONSIDERTARGET1 = '/con'
 SlashCmdList['CONSIDERTARGET'] = ConsiderTarget
+
