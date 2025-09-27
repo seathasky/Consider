@@ -66,7 +66,7 @@ The addon uses the classic MMO color system to indicate difficulty:
 
 ---
 
-[License](http://example.com](https://raw.githubusercontent.com/seathasky/Consider/refs/heads/main/LICENSE))
+[LICENSE](https://raw.githubusercontent.com/seathasky/Consider/main/LICENSE)
 
 ---
 
