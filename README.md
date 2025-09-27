@@ -16,15 +16,23 @@ A World of Warcraft Classic Era addon that emulates the classic "consider" comma
 
 ## Installation
 
-1. Click the green **Code** button (top-right of this page).
-2. Select **Download ZIP**.
-3. Extract the ZIP file.  
-   - This will create a folder named `Consider-main`.  
-   - Rename this folder to `Consider`.  
-4. Move the renamed `Consider` folder into your  
-   `World of Warcraft\_classic_era_\Interface\AddOns\` directory.
-5. Restart World of Warcraft or reload your UI (`/reload`).
-6. The addon will confirm it's loaded with a chat message.
+### Option 1: CurseForge (Recommended)
+[**Download from CurseForge**](https://www.curseforge.com/wow/addons/consider)
+
+---
+
+### Option 2: GitHub
+
+1. Click the green Code button (top-right of this page).
+2. Select Download ZIP.
+3. Extract the ZIP file.
+   - This will create a folder named "Consider-main".
+   - Rename this folder to "Consider".
+4. Move the renamed "Consider" folder into your:
+   World of Warcraft\_classic_era_\Interface\AddOns\
+5. Restart World of Warcraft or reload your UI (/reload).
+6. The addon will confirm it's loaded with a chat message.```
+
 
 
 ## Usage
