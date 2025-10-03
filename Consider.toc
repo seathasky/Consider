@@ -1,9 +1,9 @@
 ## Interface: 11507
 ## Title: Consider
-## Version: 1.0.2
+## Version: 1.0.3
 ## Author: Seathasky
 ## Notes: Emulates Consider target from classic MMOs. Meant for HC servers.
-## SavedVariables: ConsiderDB
+## Bindings: Bindings.xml
 
-
+Bindings.lua
 Consider.lua

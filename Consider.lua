@@ -2,11 +2,60 @@
 -- Copyright (c) 2025 Matthew Paul Centonze ("seathasky")
 -- Licensed under the MIT License (see LICENSE file for details)
 
-ConsiderDB = ConsiderDB or {}
+local ADDON_NAME = "Consider"
+local KEYBIND_ACTION = "CONSIDER_KEYBIND"
+local DEFAULT_BINDING = "SHIFT-G"
+
+local random = math.random
+
+local DEAD_BEAST_MESSAGES = {
+    " is asleep.",
+    " is just sleeping.",
+    " is not dead, just taking a nap.",
+    " is sleeping.",
+    " is snoring peacefully.",
+    " forgot to set an alarm.",
+    " is having the best nap ever."
+}
+
+local DEAD_CRITTER_MESSAGES = {
+    " was just trying to live peacefully.",
+    " didn't deserve this fate.",
+    " was minding its own business.",
+    " lived a simple life.",
+    " is roadkill.",
+    " never hurt anyone."
+}
+
+local DEAD_GENERAL_MESSAGES = {
+    " is pushing up daisies.",
+    " has shuffled off this mortal coil.",
+    " is taking a dirt nap.",
+    " has joined the choir invisible.",
+    " is definitely not getting back up.",
+    " is sleeping with the fishes.",
+    " has gone to the great beyond.",
+    " is deadge.",
+    " is deader than a doornail."
+}
+
+local ALIVE_CRITTER_MESSAGES = {
+    " is just trying to live peacefully.",
+    " doesn't want any trouble.",
+    " poses no threat to anyone.",
+    " just wants to be left alone.",
+    " is innocent and harmless."
+}
+
+local CLASSIFICATION_LABEL = {
+    elite = " (Elite)",
+    rare = " (Rare)",
+    rareelite = " (Rare Elite)",
+}
 
 local function GetDifficultyColor(targetLevel, playerLevel)
-    local levelDiff = targetLevel - playerLevel
-    
+    local levelDiff = (targetLevel or 0) - (playerLevel or 0)
+
     if levelDiff >= 5 then
         return "|cffff0000", " looks like it would wipe the floor with you."
     elseif levelDiff >= 3 then
@@ -19,349 +68,176 @@ local function GetDifficultyColor(targetLevel, playerLevel)
         return "|cff0080ff", " looks weak."
     elseif levelDiff >= -7 then
         return "|cff00ff00", " is no threat."
-    else
-        return "|cff808080", " poses no challenge and offers no reward."
     end
+
+    return "|cff808080", " poses no challenge and offers no reward."
 end
 
-
-local function GetDifficultyDescription(colorName)
-    if colorName == "Red" then
-        return "Impossible"
-    elseif colorName == "Orange" then
-        return "Very Hard"
-    elseif colorName == "Yellow" then
-        return "Harder"
-    elseif colorName == "White" then
-        return "Even Match"
-    elseif colorName == "Blue" then
-        return "Easier"
-    elseif colorName == "Green" then
-        return "Much Easier"
-    elseif colorName == "Gray" then
-        return "No Reward"
-    end
-    return ""
+local function PrintColoredMessage(colorCode, message)
+    print(string.format("[Consider] %s%s|r", colorCode, message))
 end
 
 local function ConsiderTarget()
     local unit = "target"
     if not UnitExists(unit) then
-        print("No target selected.")
+        print("[Consider] No target selected.")
         return
     end
-    
-    local name = UnitName(unit)
-    local level = UnitLevel(unit)
-    local playerLevel = UnitLevel("player")
-    local classif = UnitClassification(unit)
-    local classifText = ""
-    
-    -- Check if target is dead
+
+    local name = UnitName(unit) or "Unknown"
+
     if UnitIsDead(unit) then
         local creatureType = UnitCreatureType(unit)
-        
-        -- Special message for dead beasts
         if creatureType == "Beast" then
-            local sleepMessages = {
-                " is asleep.",
-                " is just sleeping.",
-                " is not dead, just taking a nap.",
-                " is sleeping.",
-                " is snoring peacefully.",
-                " forgot to set an alarm.",
-                " is having the best nap ever."
-            }
-            local randomSleep = sleepMessages[math.random(#sleepMessages)]
-            print("[Consider] |cff808080" .. name .. randomSleep .. "|r")
+            PrintColoredMessage("|cff808080", name .. DEAD_BEAST_MESSAGES[random(#DEAD_BEAST_MESSAGES)])
+            return
+        elseif creatureType == "Critter" then
+            PrintColoredMessage("|cff808080", name .. DEAD_CRITTER_MESSAGES[random(#DEAD_CRITTER_MESSAGES)])
             return
         end
-        
-        -- Special messages for dead critters
-        if creatureType == "Critter" then
-            local critterMessages = {
-                " was just trying to live peacefully.",
-                " didn't deserve this fate.",
-                " was minding its own business.",
-                " lived a simple life.",
-                " is roadkill.",
-                " never hurt anyone."
-            }
-            local randomCritter = critterMessages[math.random(#critterMessages)]
-            print("[Consider] |cff808080" .. name .. randomCritter .. "|r")
-            return
-        end
-        
-        -- Regular jokes for other creatures
-        local jokes = {
-            " is pushing up daisies.",
-            " has shuffled off this mortal coil.",
-            " is taking a dirt nap.",
-            " has joined the choir invisible.",
-            " is definitely not getting back up.",
-            " is sleeping with the fishes.",
-            " has gone to the great beyond.",
-            " is deadge.",
-            " is deader than a doornail."
-        }
-        local randomJoke = jokes[math.random(#jokes)]
-        print("[Consider] |cff808080" .. name .. randomJoke .. "|r")
+
+        PrintColoredMessage("|cff808080", name .. DEAD_GENERAL_MESSAGES[random(#DEAD_GENERAL_MESSAGES)])
         return
     end
-    
-    -- Special handling for alive critters
+
     local creatureType = UnitCreatureType(unit)
     if creatureType == "Critter" then
-        local critterAliveMessages = {
-            " is just trying to live peacefully.",
-            " doesn't want any trouble.",
-            " poses no threat to anyone.",
-            " just wants to be left alone.",
-            " is innocent and harmless."
-        }
-        local randomMessage = critterAliveMessages[math.random(#critterAliveMessages)]
-        print("[Consider] |cff00ff00" .. name .. randomMessage .. "|r")
+        PrintColoredMessage("|cff00ff00", name .. ALIVE_CRITTER_MESSAGES[random(#ALIVE_CRITTER_MESSAGES)])
         return
     end
-    
-    if classif == "elite" then
-        classifText = " (Elite)"
-    elseif classif == "rareelite" then
-        classifText = " (Rare Elite)"
-    elseif classif == "rare" then
-        classifText = " (Rare)"
-    end
-    
-    local colorCode, description = GetDifficultyColor(level, playerLevel)
-    
-    print("[Consider] " .. colorCode .. name .. classifText .. description .. "|r")
+
+    local classifText = CLASSIFICATION_LABEL[UnitClassification(unit) or ""] or ""
+    local colorCode, description = GetDifficultyColor(UnitLevel(unit), UnitLevel("player"))
+
+    PrintColoredMessage(colorCode, name .. classifText .. description)
 end
 
-local function SetKeybind(key)
-    if not key or key == "" then
-        return false
-    end
-
-    local macroName = "Consider"
-    local macroText = "/con"
-    local macroIndex = GetMacroIndexByName(macroName)
-    if macroIndex == 0 then
-        CreateMacro(macroName, "INV_Misc_QuestionMark", macroText, nil, 1)
-    else
-        EditMacro(macroIndex, macroName, "INV_Misc_QuestionMark", macroText)
-    end
-
-    return SetBinding(key, "MACRO " .. macroName)
+function Consider_OnKeybind()
+    ConsiderTarget()
 end
 
--- Create settings frame
-local settingsFrame = CreateFrame("Frame", "ConsiderSettings", UIParent, "BasicFrameTemplateWithInset")
-settingsFrame:SetSize(320, 320)
-settingsFrame:SetPoint("CENTER")
-settingsFrame:SetMovable(true)
-settingsFrame:EnableMouse(true)
-settingsFrame:RegisterForDrag("LeftButton")
-settingsFrame.title = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-settingsFrame.title:SetPoint("TOP", 0, -5)
-settingsFrame.title:SetText("Consider Settings")
-settingsFrame:SetScript("OnDragStart", function(self)
-    if self:IsMovable() then
-        self:StartMoving()
-    end
-end)
-settingsFrame:SetScript("OnDragStop", function(self)
-    self:StopMovingOrSizing()
-end)
+local settingsFrame
 
-local descriptionText = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-descriptionText:SetPoint("TOPLEFT", 16, -32)
-descriptionText:SetPoint("RIGHT", -16, 0)
-descriptionText:SetJustifyH("LEFT")
-descriptionText:SetText("Consider compares your level to your target and explains how tough the fight will be when you press your keybind or use /con.")
+local function GetKeybindSummary()
+    local primary, secondary = GetBindingKey(KEYBIND_ACTION)
 
-local colorHeader = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-colorHeader:SetPoint("TOPLEFT", descriptionText, "BOTTOMLEFT", 0, -12)
-colorHeader:SetText("Difficulty Colors")
-
-local colorLegend = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-colorLegend:SetPoint("TOPLEFT", colorHeader, "BOTTOMLEFT", 0, -8)
-colorLegend:SetPoint("RIGHT", descriptionText, "RIGHT", 0, 0)
-colorLegend:SetJustifyH("LEFT")
-colorLegend:SetText("|cffff0000Red|r – Impossible\n|cffff8000Orange|r – Extremely Dangerous\n|cffffff00Yellow|r – Harder\n|cffffffffWhite|r – Even Match\n|cff0080ffBlue|r – Easier\n|cff00ff00Green|r – Much Easier\n|cff808080Gray|r – No Reward")
-
-local divider = settingsFrame:CreateTexture(nil, "ARTWORK")
-divider:SetColorTexture(1, 1, 1, 0.15)
-divider:SetPoint("TOPLEFT", colorLegend, "BOTTOMLEFT", -4, -10)
-divider:SetPoint("TOPRIGHT", colorLegend, "BOTTOMRIGHT", 4, -10)
-divider:SetHeight(1)
-
-local keyInput = CreateFrame("EditBox", nil, settingsFrame)
-keyInput:SetSize(1, 1)
-keyInput:SetPoint("TOPLEFT")
-keyInput:SetAutoFocus(false)
-keyInput:SetAlpha(0)
-keyInput:EnableMouse(false)
-keyInput:Hide()
-
-local setKeybindButton
-local keybindLabel
-local manualInput
-
-local function NormalizeKey(key)
-    if not key then
-        return ""
+    local function formatKey(key)
+        if not key then
+            return nil
+        end
+        return GetBindingText(key, "KEY_")
     end
 
-    key = key:upper()
-    key = key:gsub("%s+", "")
-    key = key:gsub("%+", "-")
+    local formattedPrimary = formatKey(primary)
+    local formattedSecondary = formatKey(secondary)
 
-    return key
-end
-
-local function GetBindingSet()
-    if type(GetCurrentBindingSet) == "function" then
-        return GetCurrentBindingSet()
+    if formattedPrimary and formattedSecondary then
+        return formattedPrimary .. " / " .. formattedSecondary
     end
-    return 2
+
+    return formattedPrimary or formattedSecondary or "Not Bound"
 end
 
 local function UpdateKeybindDisplay()
-    local keyText = ConsiderDB.keybind or "None"
-    if keybindLabel then
-        keybindLabel:SetText("Current Keybind: " .. keyText)
+    if not settingsFrame or not settingsFrame.keybindLabel then
+        return
     end
-    if setKeybindButton then
-        if settingsFrame.waitingForKey then
-            setKeybindButton:SetText("Press a key...")
-        else
-            setKeybindButton:SetText("Capture Key")
+
+    settingsFrame.keybindLabel:SetText("Current Keybind: " .. GetKeybindSummary())
+end
+
+local function EnsureDefaultBinding()
+    local primary, secondary = GetBindingKey(KEYBIND_ACTION)
+    if primary or secondary then
+        return
+    end
+
+    if SetBinding(DEFAULT_BINDING, KEYBIND_ACTION) then
+        local bindingSet = type(GetCurrentBindingSet) == "function" and GetCurrentBindingSet() or 2
+        if type(SaveBindings) == "function" then
+            SaveBindings(bindingSet)
         end
     end
 end
 
-local function RefreshManualInput()
-    if manualInput then
-        manualInput:SetText(ConsiderDB.keybind or "")
-        manualInput:SetCursorPosition(0)
+local function EnsureSettingsFrame()
+    if settingsFrame then
+        return settingsFrame
     end
+
+    local frame = CreateFrame("Frame", "ConsiderSettings", UIParent, "BasicFrameTemplateWithInset")
+    frame:SetSize(320, 320)
+    frame:SetPoint("CENTER")
+    frame:SetMovable(true)
+    frame:EnableMouse(true)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetScript("OnDragStart", frame.StartMoving)
+    frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+
+    frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    frame.title:SetPoint("TOP", 0, -5)
+    frame.title:SetText("Consider Settings")
+
+    local descriptionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    descriptionText:SetPoint("TOPLEFT", 16, -32)
+    descriptionText:SetPoint("RIGHT", -16, 0)
+    descriptionText:SetJustifyH("LEFT")
+    descriptionText:SetText("Consider compares your level to your target and explains how tough the fight will be when you press your keybind or use /con.")
+
+    local colorHeader = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    colorHeader:SetPoint("TOPLEFT", descriptionText, "BOTTOMLEFT", 0, -12)
+    colorHeader:SetText("Difficulty Colors")
+
+    local colorLegend = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    colorLegend:SetPoint("TOPLEFT", colorHeader, "BOTTOMLEFT", 0, -8)
+    colorLegend:SetPoint("RIGHT", descriptionText, "RIGHT", 0, 0)
+    colorLegend:SetJustifyH("LEFT")
+    colorLegend:SetText("|cffff0000Red|r – Impossible\n|cffff8000Orange|r – Extremely Dangerous\n|cffffff00Yellow|r – Harder\n|cffffffffWhite|r – Even Match\n|cff0080ffBlue|r – Easier\n|cff00ff00Green|r – Much Easier\n|cff808080Gray|r – No Reward")
+
+    local divider = frame:CreateTexture(nil, "ARTWORK")
+    divider:SetColorTexture(1, 1, 1, 0.15)
+    divider:SetPoint("TOPLEFT", colorLegend, "BOTTOMLEFT", -4, -10)
+    divider:SetPoint("TOPRIGHT", colorLegend, "BOTTOMRIGHT", 4, -10)
+    divider:SetHeight(1)
+
+    frame.keybindLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.keybindLabel:SetPoint("TOPLEFT", divider, "BOTTOMLEFT", 4, -16)
+    frame.keybindLabel:SetText("Current Keybind: " .. DEFAULT_BINDING)
+
+    local rebindHint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    rebindHint:SetPoint("TOPLEFT", frame.keybindLabel, "BOTTOMLEFT", 0, -10)
+    rebindHint:SetPoint("RIGHT", descriptionText, "RIGHT", 0, 0)
+    rebindHint:SetJustifyH("LEFT")
+    rebindHint:SetText(string.format("Default keybind: %s\nYou can rebind it from Options > Keybindings > Consider.", DEFAULT_BINDING))
+
+    frame:SetScript("OnShow", UpdateKeybindDisplay)
+    frame:Hide()
+
+    settingsFrame = frame
+    UpdateKeybindDisplay()
+
+    return frame
 end
 
-local function CommitKeybind(rawKey)
-    local normalizedKey = NormalizeKey(rawKey)
-    local previousKey = ConsiderDB.keybind
-    local changed = false
-
-    if normalizedKey == "" then
-        if previousKey and previousKey ~= "" then
-            SetBinding(previousKey)
-            ConsiderDB.keybind = nil
-            print("Consider keybind cleared.")
-            changed = true
-        end
-    else
-        if previousKey and previousKey ~= "" and previousKey ~= normalizedKey then
-            SetBinding(previousKey)
-            changed = true
-        end
-
-        ConsiderDB.keybind = normalizedKey
-        if SetKeybind(normalizedKey) then
-            print("Keybind set to " .. normalizedKey)
-            changed = true
-        else
-            print("Unable to bind key: " .. normalizedKey)
-        end
-    end
-
-    if changed then
-        SaveBindings(GetBindingSet())
-    end
-
-    RefreshManualInput()
-    UpdateKeybindDisplay()
+local function ShowSettings()
+    EnsureSettingsFrame():Show()
 end
 
-keybindLabel = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-keybindLabel:SetPoint("TOPLEFT", divider, "BOTTOMLEFT", 4, -16)
-keybindLabel:SetText("Current Keybind: None")
-
-setKeybindButton = CreateFrame("Button", nil, settingsFrame, "GameMenuButtonTemplate")
-setKeybindButton:SetSize(140, 26)
-setKeybindButton:SetPoint("TOPLEFT", keybindLabel, "BOTTOMLEFT", -4, -12)
-setKeybindButton:SetText("Capture Key")
-setKeybindButton:SetScript("OnClick", function()
-    settingsFrame.waitingForKey = true
-    keyInput:Show()
-    keyInput:SetFocus()
-    manualInput:ClearFocus()
-    UpdateKeybindDisplay()
-end)
-
-manualInput = CreateFrame("EditBox", nil, settingsFrame, "InputBoxTemplate")
-manualInput:SetHeight(28)
-manualInput:SetPoint("TOPLEFT", setKeybindButton, "TOPRIGHT", 12, 0)
-manualInput:SetPoint("RIGHT", descriptionText, "RIGHT", 0, 0)
-manualInput:SetAutoFocus(false)
-manualInput:SetMaxLetters(32)
-manualInput:SetTextInsets(6, 6, 0, 0)
-manualInput:SetScript("OnEnterPressed", function(self)
-    CommitKeybind(self:GetText())
-    self:ClearFocus()
-end)
-manualInput:SetScript("OnEscapePressed", function(self)
-    self:ClearFocus()
-    RefreshManualInput()
-    UpdateKeybindDisplay()
-end)
-manualInput:SetScript("OnEditFocusGained", function(self)
-    settingsFrame.waitingForKey = false
-    keyInput:Hide()
-    UpdateKeybindDisplay()
-end)
-
-local manualHint = settingsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-manualHint:SetPoint("TOPLEFT", setKeybindButton, "BOTTOMLEFT", 4, -10)
-manualHint:SetPoint("RIGHT", descriptionText, "RIGHT", 0, 0)
-manualHint:SetJustifyH("LEFT")
-manualHint:SetText("Type a key combination (e.g., SHIFT-G) and press Enter to bind. Leave blank and press Enter to clear.")
-
-keyInput:SetScript("OnKeyDown", function(self, key)
-    if settingsFrame.waitingForKey then
-        settingsFrame.waitingForKey = false
-        self:Hide()
-        self:ClearFocus()
-        if key ~= "ESCAPE" then
-            CommitKeybind(key)
-        else
-            RefreshManualInput()
-            UpdateKeybindDisplay()
-        end
+local eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("PLAYER_LOGIN")
+eventFrame:RegisterEvent("UPDATE_BINDINGS")
+eventFrame:SetScript("OnEvent", function(_, event)
+    if event == "PLAYER_LOGIN" then
+        EnsureDefaultBinding()
+    print(string.format("|cff00ff00%s|r addon loaded. Use |cfffff200/consider|r for addon info or rebind under Options > Keybindings > Consider.", ADDON_NAME))
     end
-end)
 
-settingsFrame:SetScript("OnShow", function()
-    settingsFrame.waitingForKey = false
-    RefreshManualInput()
     UpdateKeybindDisplay()
 end)
 
-settingsFrame:Hide()
+SLASH_CONSIDERSETTINGS1 = "/consider"
+SlashCmdList.CONSIDERSETTINGS = ShowSettings
 
--- Load saved keybind
-if ConsiderDB.keybind then
-    SetKeybind(ConsiderDB.keybind)
-end
-RefreshManualInput()
-UpdateKeybindDisplay()
-
--- Print addon loaded message
-print("|cff00ff00Consider|r addon loaded. Use |cfffff200/consider|r to set keybind to consider your target.")
-
--- Slash commands
-SLASH_CONSIDERSETTINGS1 = '/consider'
-SlashCmdList['CONSIDERSETTINGS'] = function() settingsFrame:Show() end
-
-SLASH_CONSIDERTARGET1 = '/con'
-SlashCmdList['CONSIDERTARGET'] = ConsiderTarget
+SLASH_CONSIDERTARGET1 = "/con"
+SlashCmdList.CONSIDERTARGET = ConsiderTarget
 

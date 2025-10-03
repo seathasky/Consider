@@ -1,0 +1,5 @@
+<Bindings>
+    <Binding name="CONSIDER_KEYBIND" category="Consider">
+        Consider_OnKeybind()
+    </Binding>
+</Bindings>

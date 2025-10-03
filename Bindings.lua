@@ -1,0 +1,1 @@
+BINDING_NAME_CONSIDER_KEYBIND = "Consider Keybind"
