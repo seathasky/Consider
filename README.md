@@ -11,8 +11,6 @@ A World of Warcraft Classic Era addon that brings back the old-school *"consider
 - **Instant Target Check** – See difficulty based on level difference  
 - **Classic Colors** – Red = impossible, Green = trivial, etc.  
 - **Custom Keybind** – Uses the native WoW keybinding menu (default **SHIFT+G**)  
-- **Simple UI** – Drag, drop, and done  
-- **Lightweight** – No clutter, no lag  
 
 ---
 
