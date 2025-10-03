@@ -10,7 +10,7 @@ A World of Warcraft Classic Era addon that brings back the old-school *"consider
 ## Features
 - **Instant Target Check** – See difficulty based on level difference  
 - **Classic Colors** – Red = impossible, Green = trivial, etc.  
-- **Custom Keybind** – Assign any key for quick use  
+- **Custom Keybind** – Uses the native WoW keybinding menu (default **SHIFT+G**)  
 - **Simple UI** – Drag, drop, and done  
 - **Lightweight** – No clutter, no lag  
 
@@ -36,15 +36,16 @@ A World of Warcraft Classic Era addon that brings back the old-school *"consider
 ## How to Use
 
 ### Setting a Keybind
-1. Type `/consider` in chat to open the settings window  
-2. Set your keybind by either:  
-   - Clicking **Capture Key** and pressing your key combo  
-   - Typing a combo manually (e.g. `SHIFT-G`)  
-3. Your keybind saves automatically  
+1. Open **Options > Keybindings** (or press `Esc` → **Keybindings**).  
+2. Expand the **Consider** category.  
+3. Click the **Consider Keybind** slot and press your preferred combo (defaults to **SHIFT+G**).  
+4. Press **Accept** to save.  
+
+You can also type `/consider` to open the addon info window at any time.
 
 ### Using Consider
-- Press your keybind while targeting a mob/player for the difficulty check  
-- Or use `/con` directly in chat  
+- Press your keybind while targeting a mob/player for the difficulty check.  
+- Or use `/con` directly in chat.  
 
 ---
 
@@ -62,11 +63,11 @@ A World of Warcraft Classic Era addon that brings back the old-school *"consider
 ---
 
 ## Commands
-- `/consider` – Open settings & keybinds  
-- `/con` – Quick check on target  
-- Saves keybinds automatically  
+- `/consider` – Show addon info and tips  
+- `/con` – Quick check on the current target  
+- Uses Blizzard’s native keybinding save system  
 - Clean chat notifications  
 
 ---
 
-[LICENSE](https://raw.githubusercontent.com/seathasky/Consider/main/LICENSE)  
+[LICENSE](https://raw.githubusercontent.com/seathasky/Consider/main/LICENSE)
