@@ -154,6 +154,10 @@ local function EnsureDefaultBinding()
 
     if SetBinding(DEFAULT_BINDING, KEYBIND_ACTION) then
         local bindingSet = type(GetCurrentBindingSet) == "function" and GetCurrentBindingSet() or 2
+        -- Ensure bindingSet is valid (1 = account-wide, 2 = character-specific)
+        if bindingSet ~= 1 and bindingSet ~= 2 then
+            bindingSet = 2  -- Default to character-specific bindings
+        end
         if type(SaveBindings) == "function" then
             SaveBindings(bindingSet)
         end
