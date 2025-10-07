@@ -6,6 +6,11 @@ local ADDON_NAME = "Consider"
 local KEYBIND_ACTION = "CONSIDER_KEYBIND"
 local DEFAULT_BINDING = "SHIFT-G"
 
+-- Saved variables
+ConsiderDB = ConsiderDB or {
+    useVisualMessages = true, -- Default to visual messages enabled
+}
+
 local random = math.random
 
 local DEAD_BEAST_MESSAGES = {
@@ -53,6 +58,13 @@ local CLASSIFICATION_LABEL = {
     rareelite = " (Rare Elite)",
 }
 
+-- Visual message system variables
+local lastConsiderTime = 0
+local lastConsiderTarget = nil
+local CONSIDER_COOLDOWN = 5 -- 5 seconds between messages for same target
+local activeMessages = {}
+local messageFrame
+
 local function GetDifficultyColor(targetLevel, playerLevel)
     local levelDiff = (targetLevel or 0) - (playerLevel or 0)
 
@@ -73,14 +85,108 @@ local function GetDifficultyColor(targetLevel, playerLevel)
     return "|cff808080", " poses no challenge and offers no reward."
 end
 
+-- Visual message system functions
+local function CreateMessageFrame()
+    if messageFrame then
+        return messageFrame
+    end
+    
+    messageFrame = CreateFrame("Frame", "ConsiderMessageFrame", UIParent)
+    messageFrame:SetSize(800, 600)
+    messageFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 100)
+    messageFrame:SetFrameStrata("HIGH")
+    messageFrame:SetFrameLevel(100)
+    
+    return messageFrame
+end
+
+local function ShowVisualMessage(colorCode, message)
+    local currentTime = GetTime()
+    local currentTarget = UnitGUID("target") -- Use GUID to uniquely identify target
+    
+    -- Check cooldown only if targeting the same unit
+    if currentTarget == lastConsiderTarget and currentTime - lastConsiderTime < CONSIDER_COOLDOWN then
+        return false
+    end
+    
+    lastConsiderTime = currentTime
+    lastConsiderTarget = currentTarget
+    CreateMessageFrame()
+    
+    -- Calculate vertical offset based on existing messages
+    local yOffset = 0
+    for _, msg in ipairs(activeMessages) do
+        if currentTime - msg.startTime < 2 then -- Only consider recent messages for positioning
+            yOffset = yOffset + 45
+        end
+    end
+    
+    -- Create the text frame
+    local textFrame = CreateFrame("Frame", nil, messageFrame)
+    textFrame:SetSize(600, 40)
+    textFrame:SetPoint("CENTER", messageFrame, "CENTER", 0, yOffset)
+    
+    -- Create the text
+    local text = textFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+    text:SetPoint("CENTER")
+    text:SetText(colorCode .. message .. "|r")
+    text:SetJustifyH("CENTER")
+    text:SetShadowOffset(2, -2)
+    text:SetShadowColor(0, 0, 0, 1)
+    
+    -- Store in active messages
+    table.insert(activeMessages, {frame = textFrame, text = text, startTime = currentTime})
+    
+    -- Animation: scroll up and fade out over 5 seconds
+    local animationGroup = textFrame:CreateAnimationGroup()
+    
+    -- Scroll up animation
+    local translate = animationGroup:CreateAnimation("Translation")
+    translate:SetOffset(0, 150) -- Move up 150 pixels
+    translate:SetDuration(5)
+    translate:SetSmoothing("OUT")
+    
+    -- Fade out animation (start fading after 3 seconds, fade over 2 seconds)
+    local alpha = animationGroup:CreateAnimation("Alpha")
+    alpha:SetFromAlpha(1)
+    alpha:SetToAlpha(0)
+    alpha:SetDuration(2)
+    alpha:SetStartDelay(3)
+    alpha:SetSmoothing("OUT")
+    
+    -- Clean up when animation finishes
+    animationGroup:SetScript("OnFinished", function()
+        -- Remove from active messages
+        for i, msg in ipairs(activeMessages) do
+            if msg.frame == textFrame then
+                table.remove(activeMessages, i)
+                break
+            end
+        end
+        textFrame:Hide()
+        textFrame:SetParent(nil)
+    end)
+    
+    -- Start the animation
+    animationGroup:Play()
+    
+    return true
+end
+
 local function PrintColoredMessage(colorCode, message)
+    -- Always show in chat - no limitations
     print(string.format("[Consider] %s%s|r", colorCode, message))
+    
+    -- Additionally show visual message if enabled (subject to cooldown)
+    if ConsiderDB.useVisualMessages then
+        ShowVisualMessage(colorCode, message)
+    end
 end
 
 local function ConsiderTarget()
     local unit = "target"
     if not UnitExists(unit) then
-        print("[Consider] No target selected.")
+        PrintColoredMessage("|cffff0000", "No target selected.")
         return
     end
 
@@ -170,7 +276,7 @@ local function EnsureSettingsFrame()
     end
 
     local frame = CreateFrame("Frame", "ConsiderSettings", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(320, 320)
+    frame:SetSize(320, 420)
     frame:SetPoint("CENTER")
     frame:SetMovable(true)
     frame:EnableMouse(true)
@@ -214,6 +320,41 @@ local function EnsureSettingsFrame()
     rebindHint:SetJustifyH("LEFT")
     rebindHint:SetText(string.format("Default keybind: %s\nYou can rebind it from Options > Keybindings > Consider.", DEFAULT_BINDING))
 
+    -- Visual Messages Toggle
+    local visualDivider = frame:CreateTexture(nil, "ARTWORK")
+    visualDivider:SetColorTexture(1, 1, 1, 0.15)
+    visualDivider:SetPoint("TOPLEFT", rebindHint, "BOTTOMLEFT", -4, -10)
+    visualDivider:SetPoint("TOPRIGHT", rebindHint, "BOTTOMRIGHT", 4, -10)
+    visualDivider:SetHeight(1)
+
+    local visualHeader = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    visualHeader:SetPoint("TOPLEFT", visualDivider, "BOTTOMLEFT", 4, -16)
+    visualHeader:SetText("Display Options")
+
+    local visualCheckbox = CreateFrame("CheckButton", "ConsiderVisualCheckbox", frame, "InterfaceOptionsCheckButtonTemplate")
+    visualCheckbox:SetPoint("TOPLEFT", visualHeader, "BOTTOMLEFT", 0, -8)
+    visualCheckbox.Text:SetText("Use visual scrolling messages")
+    visualCheckbox.Text:SetFontObject("GameFontHighlightSmall")
+    
+    -- Set initial state
+    visualCheckbox:SetChecked(ConsiderDB.useVisualMessages)
+    
+    -- Handle checkbox clicks
+    visualCheckbox:SetScript("OnClick", function(self)
+        ConsiderDB.useVisualMessages = self:GetChecked()
+        if ConsiderDB.useVisualMessages then
+            print("[Consider] Visual scrolling messages enabled (in addition to chat).")
+        else
+            print("[Consider] Visual scrolling messages disabled (chat only).")
+        end
+    end)
+
+    local visualHint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    visualHint:SetPoint("TOPLEFT", visualCheckbox.Text, "BOTTOMLEFT", 0, -5)
+    visualHint:SetPoint("RIGHT", descriptionText, "RIGHT", 0, 0)
+    visualHint:SetJustifyH("LEFT")
+    visualHint:SetText("Shows scrolling text on screen in addition to chat output.\n5-second cooldown per target to prevent spam.")
+
     frame:SetScript("OnShow", UpdateKeybindDisplay)
     frame:Hide()
 
@@ -230,10 +371,17 @@ end
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
 eventFrame:RegisterEvent("UPDATE_BINDINGS")
-eventFrame:SetScript("OnEvent", function(_, event)
-    if event == "PLAYER_LOGIN" then
+eventFrame:RegisterEvent("ADDON_LOADED")
+eventFrame:SetScript("OnEvent", function(_, event, addonName)
+    if event == "ADDON_LOADED" and addonName == ADDON_NAME then
+        -- Initialize saved variables with defaults
+        ConsiderDB = ConsiderDB or {}
+        if ConsiderDB.useVisualMessages == nil then
+            ConsiderDB.useVisualMessages = true -- Default to enabled
+        end
+    elseif event == "PLAYER_LOGIN" then
         EnsureDefaultBinding()
-    print(string.format("|cff00ff00%s|r addon loaded. Use |cfffff200/consider|r for addon info or rebind under Options > Keybindings > Consider.", ADDON_NAME))
+        print(string.format("|cff00ff00%s|r addon loaded. Use |cfffff200/consider|r for addon info or rebind under Options > Keybindings > Consider.", ADDON_NAME))
     end
 
     UpdateKeybindDisplay()
